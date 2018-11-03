@@ -1,24 +1,26 @@
 #include <iostream>
+#include <vector>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "window.hpp"
 #include "shader.hpp"
+#include "texture.hpp"
 
 using namespace std;
 int main(int argc, char const *argv[]) {
     GLFWwindow* window = setupWindow(600, 600, "noname", false);
 
     // Vertex input
-    GLfloat vertices[] = {
+    vector<GLfloat> vertices = {
         -1.0f, -1.0f,
         -1.0f,  1.0f,
          1.0f,  1.0f,
          1.0f, -1.0f
     };
 
-    GLuint elements[] = {
+    vector<GLuint> elements = {
         0, 1, 2, 0, 2, 3
     };
 
@@ -30,12 +32,12 @@ int main(int argc, char const *argv[]) {
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     // Upload vertex data
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
 
     GLuint EBO;
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(GLuint), elements.data(), GL_STATIC_DRAW);
 
     // Set up shaders
     GLuint program = createLinkVFShaderProgram("assets/shaders/default");
@@ -45,6 +47,11 @@ int main(int argc, char const *argv[]) {
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
+
+    glActiveTexture(GL_TEXTURE0);
+    GLuint texture = loadTexture("assets/textures/test.png");
+    GLint texpos = glGetUniformLocation(program, "tex");
+    glUniform1ui(texpos, texture);
 
     glClearColor(0.01f, 0.01f, 0.01f, 1.0f);
     glEnable(GL_BLEND);
