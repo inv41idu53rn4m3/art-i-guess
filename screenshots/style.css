@@ -1,0 +1,16 @@
+img {
+    max-height: 300px;
+    margin-bottom: 10px;
+    border: solid 3px darkgrey;
+}
+
+p {
+    box-sizing: border-box;
+    width: 70%;
+    text-align: center;
+    margin: 10px auto;
+    padding: 30px;
+    background: lightgrey;
+    border: dashed 3px darkgrey;
+    border-radius: 30px;
+}

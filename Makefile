@@ -1,12 +1,22 @@
+# Dummy targets
+# Main program
+build: bin/test
+
+# Progress showcase
+info: screenshots/index.html
+
+# Clean up build directory
+clean:
+	rm build/*
+
 # Some shorthands
 compile := g++ -O3 -std=c++11
 libflags := -l:./libglfw.so.3.2 -lGL -ldl
 includes := -Iinclude
 
-# Main build target
+# Main program target
 bin/test: build/test.o build/window.o build/shader.o build/texture.o build/lodepng.o build/glad.o
 	$(compile) -o $@ $^ $(libflags) $(includes)
-	bin/test
 
 # Partial compile targets
 build/test.o: test.cpp window.hpp shader.hpp texture.hpp
@@ -22,5 +32,7 @@ build/lodepng.o: lodepng.cpp
 build/glad.o: glad.c
 	$(compile) -c -o $@ $< $(libflags) $(includes)
 
-clean:
-	rm build/*
+screenshots/index.html: screenshots/info.md screenshots/head.html screenshots/tail.html
+	cat screenshots/head.html > screenshots/index.html
+	markdown screenshots/info.md >> screenshots/index.html
+	cat screenshots/tail.html >> screenshots/index.html
