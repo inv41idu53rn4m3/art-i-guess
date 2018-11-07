@@ -1,7 +1,14 @@
+:root {
+    --border-color: gray;
+}
+body {
+    background: #112233;
+}
+
 img {
     max-height: 300px;
     margin-bottom: 10px;
-    border: solid 3px darkgrey;
+    border: solid 3px var(--border-color);
 }
 
 p {
@@ -10,7 +17,7 @@ p {
     text-align: center;
     margin: 10px auto;
     padding: 30px;
-    background: lightgrey;
-    border: dashed 3px darkgrey;
+    background: darkgray;
+    border: dashed 3px var(--border-color);
     border-radius: 30px;
 }
