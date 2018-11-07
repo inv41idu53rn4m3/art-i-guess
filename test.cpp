@@ -49,13 +49,13 @@ int main(int argc, char const *argv[]) {
     glBindVertexArray(0);
 
     glActiveTexture(GL_TEXTURE0);
-    GLuint texture = loadTexture("assets/textures/test.png");
+    GLuint texture = loadTexture("assets/textures/bump.png");
     GLint texpos = glGetUniformLocation(program, "tex");
     glUniform1ui(texpos, texture);
 
     glClearColor(0.01f, 0.01f, 0.01f, 1.0f);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     while(!glfwWindowShouldClose(window))
     {

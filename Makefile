@@ -6,7 +6,6 @@ includes := -Iinclude
 # Main build target
 bin/test: build/test.o build/window.o build/shader.o build/texture.o build/lodepng.o build/glad.o
 	$(compile) -o $@ $^ $(libflags) $(includes)
-	ctags -R --fields=+l
 	bin/test
 
 # Partial compile targets
