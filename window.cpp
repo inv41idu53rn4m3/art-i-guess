@@ -28,6 +28,7 @@ GLFWwindow* setupWindow(int w, int h, string title, bool resizable) {
     }
 
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(0);
 
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     glViewport(0, 0, w, h);

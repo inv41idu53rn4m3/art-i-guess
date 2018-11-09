@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -57,10 +58,16 @@ int main(int argc, char const *argv[]) {
     //glEnable(GL_BLEND);
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    unsigned int framecount = 0;
+    glfwSetTime(0);
     while(!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
         glClear(GL_COLOR_BUFFER_BIT);
+
+        float lx = sin(glfwGetTime());
+        float ly = cos(glfwGetTime());
+        glUniform3f(glGetUniformLocation(program, "lpos"), lx, ly, -0.1);
 
         // Draw stuff
         glBindVertexArray(VAO);
@@ -68,7 +75,10 @@ int main(int argc, char const *argv[]) {
         glBindVertexArray(0);
 
         glfwSwapBuffers(window);
+        framecount++;
     }
+
+    cout << framecount / glfwGetTime() << "fps" << endl;
 
     glfwTerminate();
     return 0;
