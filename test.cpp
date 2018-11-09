@@ -49,7 +49,7 @@ int main(int argc, char const *argv[]) {
     glBindVertexArray(0);
 
     glActiveTexture(GL_TEXTURE0);
-    GLuint texture = loadTexture("assets/textures/bump.png");
+    GLuint texture = loadTexture("assets/textures/normal.png");
     GLint texpos = glGetUniformLocation(program, "tex");
     glUniform1ui(texpos, texture);
 
