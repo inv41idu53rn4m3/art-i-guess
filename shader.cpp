@@ -1,6 +1,39 @@
 #include "shader.hpp"
 
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <map>
+
+#include <glad/glad.h>
+
 using namespace std;
+
+map<string, vector<string>> namedict;
+
+void loadShaderNames() {
+    ifstream file;
+    file.open("assets/shaders/name_definitions");
+    if (file.good()) {
+        string line;
+        while (!getline(file, line).eof()) {
+            int lastpos = line.find(" ");
+            string name = line.substr(0, lastpos);
+            vector<string> files;
+            for (int i = 0; lastpos != string::npos; i++) {
+                lastpos++;
+                int nextpos = line.find(" ", lastpos);
+                files.push_back(line.substr(lastpos, nextpos - lastpos));
+                lastpos = nextpos;
+            }
+            namedict[name] = files;
+        }
+    } else {
+        clog << "Failed to load shader list" << endl;
+    }
+}
+
 GLuint createShader(string source, GLenum type) {
     fstream file;
     // Open shader source file
@@ -52,12 +85,10 @@ void linkShaderProgram(GLuint program) {
 
 GLuint createLinkVFShaderProgram(string name) {
     clog << "Creating vertex shader" << endl;
-    string vertname = name;
-    vertname += ".vert";
+    string vertname = "assets/shaders/" + namedict[name][0];
     GLuint vertexShader = createShader(vertname, GL_VERTEX_SHADER);
     clog << "Creating fragment shader" << endl;
-    string fragname = name;
-    fragname += ".frag";
+    string fragname = "assets/shaders/" + namedict[name][1];
     GLuint fragmentShader = createShader(fragname, GL_FRAGMENT_SHADER);
     GLuint program = glCreateProgram();
     glAttachShader(program, vertexShader);

@@ -41,22 +41,27 @@ int main(int argc, char const *argv[]) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(GLuint), elements.data(), GL_STATIC_DRAW);
 
     // Set up shaders
-    GLuint program = createLinkVFShaderProgram("assets/shaders/default");
+    loadShaderNames();
+    GLuint program = createLinkVFShaderProgram("default");
     glUseProgram(program);
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (void*) 0);
     glEnableVertexAttribArray(0);
 
-    glBindVertexArray(0);
-
     glActiveTexture(GL_TEXTURE0);
-    GLuint texture = loadTexture("assets/textures/normal.png");
-    GLint texpos = glGetUniformLocation(program, "tex");
-    glUniform1ui(texpos, texture);
+    GLuint normalmap = genTexture(true, false);
+    loadTexture("assets/textures/normal.png");
+    setTexUniform("normal", 0, program);
+
+    glActiveTexture(GL_TEXTURE1);
+    GLuint heightmap = genTexture(true, false);
+    loadTexture("assets/textures/bump.png");
+    setTexUniform("height", 1, program);
+
 
     glClearColor(0.01f, 0.01f, 0.01f, 1.0f);
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     unsigned int framecount = 0;
     glfwSetTime(0);
@@ -67,12 +72,10 @@ int main(int argc, char const *argv[]) {
 
         float lx = sin(glfwGetTime());
         float ly = cos(glfwGetTime());
-        glUniform3f(glGetUniformLocation(program, "lpos"), lx, ly, -0.1);
+        glUniform3f(glGetUniformLocation(program, "lpos"), lx, ly, -0.3);
 
         // Draw stuff
-        glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
 
         glfwSwapBuffers(window);
         framecount++;

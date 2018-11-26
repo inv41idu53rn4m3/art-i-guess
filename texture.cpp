@@ -1,8 +1,14 @@
 #include "texture.hpp"
 
+#include <iostream>
+#include <vector>
+
+#include <lodepng/lodepng.h>
+#include <glad/glad.h>
+
 using namespace std;
 
-GLuint loadTexture(string filename) {
+void loadTexture(const string& filename) {
     // Load texture from file
     vector<unsigned char> buffer;
     unsigned int w, h;
@@ -12,16 +18,37 @@ GLuint loadTexture(string filename) {
         clog << "LodePNG error " << error << ": " << lodepng_error_text(error) << endl;
     }
 
-
     // Upload texture to GPU
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer.data());
+}
+
+GLuint genTexture(bool interpolate, bool tile, float r, float g, float b, float a) {
     GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer.data());
+    if (interpolate) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    } else {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
+
+    if (tile) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    } else {
+        float borderColor[] = {r, g, b, a};
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    }
 
     return texture;
 }
+
+void setTexUniform(const string& name, GLuint texture, GLuint program) {
+    GLint texpos = glGetUniformLocation(program, name.c_str());
+    glUniform1i(texpos, texture);
+}
+

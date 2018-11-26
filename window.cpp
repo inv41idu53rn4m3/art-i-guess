@@ -1,5 +1,11 @@
 #include "window.hpp"
 
+#include <iostream>
+#include <string>
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 using namespace std;
 
 void resize_callback(GLFWwindow* window, int width, int height)
