@@ -15,7 +15,7 @@ libflags := -l:./libglfw.so.3.2 -lGL -ldl
 includes := -Iinclude
 
 # Main program target
-bin/test: build/test.o build/window.o build/shader.o build/texture.o build/lodepng.o build/glad.o
+bin/test: build/test.o build/window.o build/shader.o build/texture.o build/framebuffer.o build/lodepng.o build/glad.o
 	$(compile) -o $@ $^ $(libflags) $(includes)
 
 # Partial compile targets
@@ -26,6 +26,8 @@ build/window.o: window.cpp window.hpp
 build/shader.o: shader.cpp shader.hpp
 	$(compile) -c -o $@ $< $(libflags) $(includes)
 build/texture.o: texture.cpp texture.hpp
+	$(compile) -c -o $@ $< $(libflags) $(includes)
+build/framebuffer.o: framebuffer.cpp framebuffer.hpp
 	$(compile) -c -o $@ $< $(libflags) $(includes)
 build/lodepng.o: lodepng.cpp
 	$(compile) -c -o $@ $< $(libflags) $(includes)

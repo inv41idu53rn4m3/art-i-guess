@@ -8,11 +8,6 @@
 
 using namespace std;
 
-void resize_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-} 
-
 GLFWwindow* setupWindow(int w, int h, string title, bool resizable) {
     glfwInit();
 
@@ -27,10 +22,6 @@ GLFWwindow* setupWindow(int w, int h, string title, bool resizable) {
     GLFWwindow* window = glfwCreateWindow(w, h, title.c_str(), NULL, NULL);
     if (window == NULL) {
         clog << "Failed to create GLFW window" << endl;
-    }
-
-    if (resizable) {
-        glfwSetFramebufferSizeCallback(window, resize_callback);
     }
 
     glfwMakeContextCurrent(window);

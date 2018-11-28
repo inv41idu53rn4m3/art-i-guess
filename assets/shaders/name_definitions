@@ -1,1 +1,4 @@
 default default.vert default.frag
+blend default_noflip.vert blend.frag
+blurh default_noflip.vert blurh.frag
+blurv default_noflip.vert blurv.frag

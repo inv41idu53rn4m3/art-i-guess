@@ -9,6 +9,6 @@ using namespace std;
 
 void loadTexture(const string& filename);
 void setTexUniform(const string& name, GLuint texture, GLuint program);
-GLuint genTexture(bool interpolate, bool tile, float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 0.0f);
+GLuint genTexture(bool interpolate = true, GLint wrap = GL_CLAMP_TO_BORDER, float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 0.0f);
 
 #endif
