@@ -8,7 +8,7 @@
 
 using namespace std;
 
-GLFWwindow* setupWindow(int w, int h, string title, bool resizable) {
+GLFWwindow* setupWindow(int w, int h, string title, bool resizable, bool fullscreen) {
     glfwInit();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -19,7 +19,14 @@ GLFWwindow* setupWindow(int w, int h, string title, bool resizable) {
 
     glfwWindowHint(GLFW_SAMPLES, 16);
 
-    GLFWwindow* window = glfwCreateWindow(w, h, title.c_str(), NULL, NULL);
+    GLFWwindow* window;
+    if (fullscreen) {
+        const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        window = glfwCreateWindow(mode->width, mode->height, title.c_str(), glfwGetPrimaryMonitor(), NULL);
+    } else {
+        window = glfwCreateWindow(w, h, title.c_str(), NULL, NULL);
+    }
+    
     if (window == NULL) {
         clog << "Failed to create GLFW window" << endl;
     }

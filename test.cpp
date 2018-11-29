@@ -19,9 +19,16 @@ void resizeCallback(GLFWwindow* window, int width, int height) {
     h = height;
 }
 
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_ESCAPE) {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+}
+
 int main(int argc, char const *argv[]) {
-    GLFWwindow* window = setupWindow(600, 600, "noname", false);
+    GLFWwindow* window = setupWindow(w, h, "noname", true, true);
     glfwSetWindowSizeCallback(window, resizeCallback);
+    glfwSetKeyCallback(window, keyCallback);
 
     // Vertex input
     vector<GLfloat> vertices = {
@@ -57,6 +64,7 @@ int main(int argc, char const *argv[]) {
     GLuint blurh = createLinkVFShaderProgram("blurh"); // Horizontal blur
     GLuint blurv = createLinkVFShaderProgram("blurv"); // Vertical blur
     GLuint blend = createLinkVFShaderProgram("blend");
+    GLuint gentree = createLinkVFShaderProgram("gentree");
 
     // Define vertex data format
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (void*) 0);
@@ -64,14 +72,23 @@ int main(int argc, char const *argv[]) {
 
     glUseProgram(default_program);
     glActiveTexture(GL_TEXTURE0);
-    GLuint normalmap = genTexture();
-    loadTexture("assets/textures/normal.png");
+    genTexture();
+    loadTexture("assets/textures/normal2.png");
     setTexUniform("normal", 0, default_program);
 
+    glActiveTexture(GL_TEXTURE6);
+    genTexture();
+    loadTexture("assets/textures/diffuse.png");
+    setTexUniform("diffuse", 6, default_program);
+
+    glActiveTexture(GL_TEXTURE7);
+    genTexture();
+    loadTexture("assets/textures/spectral.png");
+    setTexUniform("spectral", 7, default_program);
+
     glActiveTexture(GL_TEXTURE1);
-    GLuint heightmap = genTexture();
-    loadTexture("assets/textures/bump.png");
-    setTexUniform("height", 1, default_program);
+    genTexture();
+    loadTexture("assets/textures/bump2.png");
 
     // Generate framebuffers
     glActiveTexture(GL_TEXTURE2);
@@ -80,11 +97,23 @@ int main(int argc, char const *argv[]) {
     auto blurh_fb = genFB(1024, 1024);
     glActiveTexture(GL_TEXTURE4);
     auto blurv_fb = genFB(1024, 1024);
+    glActiveTexture(GL_TEXTURE5);
+    auto shadowtree = genFB(1536, 1024);
 
     // Set basic OpenGL settings
     glClearColor(0.01f, 0.01f, 0.01f, 1.0f);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Generate shadowtree in framebuffer
+    glViewport(0, 0, 1536, 1024);
+    glUseProgram(gentree);
+    setTexUniform("tex", 1, gentree);
+    glBindFramebuffer(GL_FRAMEBUFFER, get<1>(shadowtree));
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    glUseProgram(default_program);
+    setTexUniform("height", 5, default_program);
 
     unsigned int framecount = 0;
     glfwSetTime(0);
@@ -96,9 +125,12 @@ int main(int argc, char const *argv[]) {
         glViewport(0, 0, 1024, 1024);
         glUseProgram(default_program);
         // Calculate position of moving light
-        float lx = sin(glfwGetTime());
-        float ly = cos(glfwGetTime());
-        glUniform3f(glGetUniformLocation(default_program, "lpos"), lx, ly, -0.3);
+        float lx = sin(glfwGetTime()) * 0.03 + 0.7;
+        float ly = cos(glfwGetTime()) * 0.03 - 0.8;
+        float lz = cos(glfwGetTime() / 7.0) * 0.1 - 0.3;
+        float lb = sin(glfwGetTime() / 10.0) * 0.3 + 1.0;
+        glUniform3f(glGetUniformLocation(default_program, "lpos"), lx, ly, lz);
+        glUniform1f(glGetUniformLocation(default_program, "lbright"), lb);
         glBindFramebuffer(GL_FRAMEBUFFER, get<1>(main_fb));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -108,6 +140,7 @@ int main(int argc, char const *argv[]) {
         setTexUniform("framebuffer", 2, blurh);
         glBindFramebuffer(GL_FRAMEBUFFER, get<1>(blurh_fb));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        /*
         for (int i = 0; i < 10; i++) {
             glUseProgram(blurv);
             glUniform1f(glGetUniformLocation(blurv, "h"), 1024.0);
@@ -121,6 +154,7 @@ int main(int argc, char const *argv[]) {
             glBindFramebuffer(GL_FRAMEBUFFER, get<1>(blurh_fb));
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         }
+        */
         glUseProgram(blurv);
         glUniform1f(glGetUniformLocation(blurv, "h"), 1024.0);
         setTexUniform("framebuffer", 3, blurv);
@@ -129,7 +163,7 @@ int main(int argc, char const *argv[]) {
         // End of blur
 
         // Finally blend unblurred and blurred textures
-        glViewport(0, 0, w, h);
+        glViewport((w - min(w, h)) / 2, (h - min(w, h)) / 2, min(w, h), min(w, h));
         glUseProgram(blend);
         setTexUniform("tex1", 2, blend);
         setTexUniform("tex2", 4, blend);

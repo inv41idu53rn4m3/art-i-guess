@@ -6,6 +6,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-GLFWwindow* setupWindow(int w, int h, std::string title, bool resizable);
+GLFWwindow* setupWindow(int w, int h, std::string title, bool resizable, bool fullscreen);
 
 #endif
