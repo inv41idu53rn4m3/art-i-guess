@@ -125,10 +125,11 @@ int main(int argc, char const *argv[]) {
         glViewport(0, 0, 1024, 1024);
         glUseProgram(default_program);
         // Calculate position of moving light
-        float lx = sin(glfwGetTime()) * 0.03 + 0.7;
-        float ly = cos(glfwGetTime()) * 0.03 - 0.8;
-        float lz = cos(glfwGetTime() / 7.0) * 0.1 - 0.3;
-        float lb = sin(glfwGetTime() / 10.0) * 0.3 + 1.0;
+        float t = glfwGetTime();
+        float lx = sin(t / 7.0) * 0.1 + 0.7;
+        float ly = cos(t) * 0.03 - 0.8;
+        float lz = cos(t / 10.0) * 0.3 - 0.6;
+        float lb = sin(t / 10.0) * 0.1 + 0.9;
         glUniform3f(glGetUniformLocation(default_program, "lpos"), lx, ly, lz);
         glUniform1f(glGetUniformLocation(default_program, "lbright"), lb);
         glBindFramebuffer(GL_FRAMEBUFFER, get<1>(main_fb));
