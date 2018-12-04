@@ -1,6 +1,6 @@
 # Dummy targets
 # Main program
-build: bin/test
+build: bin/ build/ bin/test
 
 # Progress showcase
 info: screenshots/index.html
@@ -8,6 +8,7 @@ info: screenshots/index.html
 # Clean up build directory
 clean:
 	rm build/*
+	rm bin/test
 
 # Some shorthands
 compile := g++ -O3 -std=c++11
@@ -33,6 +34,11 @@ build/lodepng.o: lodepng.cpp
 	$(compile) -c -o $@ $< $(libflags) $(includes)
 build/glad.o: glad.c
 	$(compile) -c -o $@ $< $(libflags) $(includes)
+
+build/:
+	mkdir build
+bin/:
+	mkdir bin
 
 screenshots/index.html: screenshots/info.md screenshots/head.html screenshots/tail.html
 	cat screenshots/head.html > screenshots/index.html
